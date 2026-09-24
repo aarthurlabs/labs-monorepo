@@ -190,3 +190,55 @@
     --text-label--font-weight: var(--type-label-weight);
     --text-label--letter-spacing: var(--type-label-letter-spacing);
 }
+
+@layer base {
+    /*
+     * Selection
+     */
+
+    ::selection {
+        background: var(--brand-300);
+        color: var(--on-brand);
+    }
+
+    ::-moz-selection {
+        background: var(--brand-300);
+        color: var(--on-brand);
+    }
+
+    /*
+     * Scrollbar — Firefox
+     */
+
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--line-strong) var(--bg);
+    }
+
+    /*
+     * Scrollbar — Chromium / Safari
+     */
+
+    *::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: var(--bg);
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: var(--line-strong);
+        border: 2px solid var(--bg);
+        border-radius: var(--radius-pill);
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+        background: var(--text-muted);
+    }
+
+    *::-webkit-scrollbar-corner {
+        background: var(--bg);
+    }
+}

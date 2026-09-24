@@ -1,22 +1,7 @@
 import { Suspense } from 'react'
-import { MdxContent } from '@labs/ui/components/mdx/mdx-content'
+import Link from 'next/link'
 import { FeaturedPostsList } from './_components/featured-posts/featured-posts-list'
-
-const exampleContent = `# Cache na Weather API
-
-## Problema
-
-Descreva o problema que motivou o experimento.
-
-## Solução
-
-Explique a implementação em MDX. Você pode usar **Markdown**, listas e blocos de código.
-
-### Próximos passos
-
-- [ ] Documentar os resultados
-- [ ] Revisar a estratégia de cache
-`
+import { RecentPostsList } from './_components/recent-posts/recent-posts-list'
 
 function FeaturedPostsSkeleton() {
     return (
@@ -34,12 +19,42 @@ function FeaturedPostsSkeleton() {
     )
 }
 
+function RecentPostsSkeleton() {
+    return (
+        <div
+            role="status"
+            aria-label="Carregando posts recentes"
+            className="mx-auto w-full max-w-[var(--content-width)] px-space-4 pt-space-16"
+        >
+            <div aria-hidden="true" className="mb-space-3 h-8 w-full animate-pulse rounded-sm bg-surface-raised" />
+            {Array.from({ length: 3 }, (_, index) => (
+                <div key={index} aria-hidden="true" className="space-y-space-2 border-t border-line py-space-4">
+                    <div className="h-5 w-2/3 animate-pulse rounded-sm bg-surface-raised" />
+                    <div className="h-4 w-full animate-pulse rounded-sm bg-surface-raised" />
+                </div>
+            ))}
+            <span className="sr-only">Carregando posts recentes...</span>
+        </div>
+    )
+}
+
 export default function Home() {
     return (
         <main>
             <Suspense fallback={<FeaturedPostsSkeleton />}>
                 <FeaturedPostsList />
             </Suspense>
+            <Suspense fallback={<RecentPostsSkeleton />}>
+                <RecentPostsList />
+            </Suspense>
+            <div className="mx-auto hidden w-full max-w-[var(--content-width)] px-space-4 pt-space-6 peer:block">
+                <Link
+                    href="/explorar"
+                    className="inline-flex h-10 items-center gap-space-3 rounded-pill border border-line bg-surface px-space-4 text-small font-semibold text-text transition-colors hover:border-line-strong focus-visible:outline-2 focus-visible:outline-accent-text"
+                >
+                    Explorar laboratório <span aria-hidden="true" className="text-accent-text">→</span>
+                </Link>
+            </div>
         </main>
     )
 }

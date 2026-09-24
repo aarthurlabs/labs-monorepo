@@ -12,7 +12,8 @@
         "@labs/database": "workspace:*",
         "next": "16.3.6",
         "react": "19.2.8",
-        "react-dom": "19.2.8"
+        "react-dom": "19.2.8",
+        "use-debounce": "^10.1.1"
     },
     "devDependencies": {
         "@labs/tsconfig": "workspace:*",

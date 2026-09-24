@@ -26,9 +26,16 @@ function RecentPostsSkeleton() {
             aria-label="Carregando posts recentes"
             className="mx-auto w-full max-w-[var(--content-width)] px-space-4 pt-space-16"
         >
-            <div aria-hidden="true" className="mb-space-3 h-8 w-full animate-pulse rounded-sm bg-surface-raised" />
+            <div
+                aria-hidden="true"
+                className="mb-space-3 h-8 w-full animate-pulse rounded-sm bg-surface-raised"
+            />
             {Array.from({ length: 3 }, (_, index) => (
-                <div key={index} aria-hidden="true" className="space-y-space-2 border-t border-line py-space-4">
+                <div
+                    key={index}
+                    aria-hidden="true"
+                    className="space-y-space-2 border-t border-line py-space-4"
+                >
                     <div className="h-5 w-2/3 animate-pulse rounded-sm bg-surface-raised" />
                     <div className="h-4 w-full animate-pulse rounded-sm bg-surface-raised" />
                 </div>
@@ -47,12 +54,15 @@ export default function Home() {
             <Suspense fallback={<RecentPostsSkeleton />}>
                 <RecentPostsList />
             </Suspense>
-            <div className="mx-auto hidden w-full max-w-[var(--content-width)] px-space-4 pt-space-6 peer:block">
+            <div className="mx-auto w-full max-w-[var(--content-width)] px-space-4 pt-space-16 peer:block">
                 <Link
-                    href="/explorar"
+                    href="/posts"
                     className="inline-flex h-10 items-center gap-space-3 rounded-pill border border-line bg-surface px-space-4 text-small font-semibold text-text transition-colors hover:border-line-strong focus-visible:outline-2 focus-visible:outline-accent-text"
                 >
-                    Explorar laboratório <span aria-hidden="true" className="text-accent-text">→</span>
+                    Explorar laboratório{' '}
+                    <span aria-hidden="true" className="text-accent-text">
+                        →
+                    </span>
                 </Link>
             </div>
         </main>

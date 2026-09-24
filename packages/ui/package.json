@@ -1,12 +1,10 @@
 {
     "name": "@labs/ui",
     "version": "1.0.0",
+    "type": "module",
     "exports": {
-        ".": "./src/index.ts",
-        "./components": "./src/components/index.ts",
         "./components/*": "./src/components/*.tsx",
-        "./brand": "./src/brand/index.ts",
-        "./brand/assets/*": "./src/brand/assets/*",
+        "./assets/*": "./src/assets/*",
         "./styles.css": "./src/styles.css"
     },
     "devDependencies": {
@@ -19,5 +17,9 @@
     "peerDependencies": {
         "react": "19.2.8",
         "react-dom": "19.2.8"
+    },
+    "dependencies": {
+        "@mdx-js/mdx": "^3.1.1",
+        "remark-gfm": "^4.0.1"
     }
 }

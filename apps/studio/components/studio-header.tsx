@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Badge, LabMark } from '@labs/ui'
+import { Badge } from '@labs/ui/components/badge'
+import { LabMark } from '@labs/ui/components/brand/lab-mark'
 
 export function StudioHeader() {
     return (

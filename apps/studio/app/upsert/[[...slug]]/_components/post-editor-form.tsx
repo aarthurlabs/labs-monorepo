@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Post } from '@labs/database'
 import { LabMark } from '@labs/ui/components/brand/lab-mark'
@@ -15,6 +16,7 @@ import { Textarea } from '@labs/ui/components/textarea'
 import { Controller, useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 import slugify from 'slugify'
+
 import { postFormSchema, type PostFormValues } from './post-form.schema'
 import { upsertPost } from './upsert-post.action'
 
@@ -28,25 +30,16 @@ const typeOptions = [
     { value: 'EXPERIMENT', label: 'Experimento' },
 ] as const
 
-const statusOptions = [
-    { value: 'DRAFT', label: 'Rascunho' },
-    { value: 'PUBLISHED', label: 'Publicado' },
-] as const
-
 function getDefaultValues(post?: Post): PostFormValues {
     return {
         title: post?.title ?? '',
         description: post?.description ?? '',
         type: post?.type ?? 'EXPERIMENT',
-        status: post?.status ?? 'DRAFT',
         number: post?.number ?? undefined,
         tags: post?.tags ?? [],
         repositoryUrl: post?.repositoryUrl ?? '',
         liveUrl: post?.liveUrl ?? '',
         featured: post?.featured ?? false,
-        publishedAt: post?.publishedAt
-            ? post.publishedAt.toISOString().slice(0, 10)
-            : '',
         learnedTitle: post?.learnedTitle ?? '',
         learnedContent: post?.learnedContent ?? '',
         content: post?.content ?? '',
@@ -55,10 +48,13 @@ function getDefaultValues(post?: Post): PostFormValues {
 
 export function PostEditorForm({ post }: PostEditorFormProps) {
     const router = useRouter()
+
     const [tagDraft, setTagDraft] = useState('')
     const [isSaving, setIsSaving] = useState(false)
     const [saveError, setSaveError] = useState<string | null>(null)
+
     const previousPostId = useRef(post?.id)
+
     const {
         control,
         register,
@@ -80,9 +76,11 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
 
     function addTag(tags: string[], onChange: (tags: string[]) => void) {
         const tag = tagDraft.trim()
+
         if (tag && !tags.includes(tag)) {
             onChange([...tags, tag])
         }
+
         setTagDraft('')
     }
 
@@ -91,14 +89,16 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
         event?: React.BaseSyntheticEvent,
     ) {
         if (isSaving) return
+
         setIsSaving(true)
         setSaveError(null)
 
         const submitter = (event?.nativeEvent as SubmitEvent | undefined)
             ?.submitter
+
         const intent =
             submitter?.getAttribute('value') === 'publish' ? 'publish' : 'draft'
-        const status = intent === 'publish' ? 'PUBLISHED' : 'DRAFT'
+
         const slug = slugify(values.title, {
             lower: true,
             strict: true,
@@ -107,12 +107,12 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
         })
 
         let navigating = false
+
         try {
             const result = await upsertPost({
                 ...values,
                 id: post?.id,
                 slug,
-                status,
                 intent,
             })
 
@@ -121,22 +121,21 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                 return
             }
 
-            reset({
-                ...values,
-                status: result.post.status,
-                publishedAt: result.post.publishedAt,
-            })
+            reset(values)
 
             if (!post || post.slug !== result.post.slug) {
                 navigating = true
                 router.replace(`/upsert/${result.post.slug}`)
-            } else {
-                router.refresh()
+                return
             }
+
+            router.refresh()
         } catch {
             setSaveError('Não foi possível salvar o post. Tente novamente.')
         } finally {
-            if (!navigating) setIsSaving(false)
+            if (!navigating) {
+                setIsSaving(false)
+            }
         }
     }
 
@@ -160,6 +159,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                             <Input
                                 variant="title"
                                 placeholder="Título do post"
+                                aria-invalid={Boolean(errors.title)}
                                 {...register('title')}
                             />
                         </Field>
@@ -170,6 +170,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                         >
                             <Textarea
                                 placeholder="Uma ou duas frases que apresentam o post."
+                                aria-invalid={Boolean(errors.description)}
                                 {...register('description')}
                             />
                         </Field>
@@ -179,6 +180,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                                 <span className="text-label font-medium text-text-muted">
                                     Tipo
                                 </span>
+
                                 <Controller
                                     control={control}
                                     name="type"
@@ -198,6 +200,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                                         />
                                     )}
                                 />
+
                                 {errors.type && (
                                     <span
                                         id="type-error"
@@ -219,6 +222,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                                     step={1}
                                     mono
                                     placeholder="01"
+                                    aria-invalid={Boolean(errors.number)}
                                     {...register('number', {
                                         setValueAs: (value: string) =>
                                             value === ''
@@ -228,57 +232,11 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                                 />
                             </Field>
 
-                            <Field
-                                label="Data de publicação"
-                                error={errors.publishedAt?.message}
-                            >
-                                <Input
-                                    type="date"
-                                    {...register('publishedAt')}
-                                />
-                            </Field>
-                        </div>
-
-                        <div className="grid gap-space-4 md:grid-cols-2">
-                            <div className="flex min-w-0 flex-col gap-[5px]">
-                                <span className="text-label font-medium text-text-muted">
-                                    Status
-                                </span>
-                                <Controller
-                                    control={control}
-                                    name="status"
-                                    render={({ field }) => (
-                                        <SegmentedControl
-                                            label="Status"
-                                            options={statusOptions}
-                                            value={field.value}
-                                            onValueChange={field.onChange}
-                                            onBlur={field.onBlur}
-                                            aria-invalid={Boolean(
-                                                errors.status,
-                                            )}
-                                            aria-describedby={
-                                                errors.status
-                                                    ? 'status-error'
-                                                    : undefined
-                                            }
-                                        />
-                                    )}
-                                />
-                                {errors.status && (
-                                    <span
-                                        id="status-error"
-                                        className="text-label text-danger"
-                                    >
-                                        {errors.status.message}
-                                    </span>
-                                )}
-                            </div>
-
                             <div className="flex min-w-0 flex-col gap-[5px]">
                                 <span className="text-label font-medium text-text-muted">
                                     Destaque
                                 </span>
+
                                 <Controller
                                     control={control}
                                     name="featured"
@@ -304,6 +262,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                                         />
                                     )}
                                 />
+
                                 {errors.featured && (
                                     <span
                                         id="featured-error"
@@ -322,6 +281,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                             >
                                 Tags
                             </label>
+
                             <Controller
                                 control={control}
                                 name="tags"
@@ -343,6 +303,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                                                 {tag}
                                             </Tag>
                                         ))}
+
                                         <input
                                             id="post-tags"
                                             name={field.name}
@@ -354,6 +315,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                                             onKeyDown={(event) => {
                                                 if (event.key === 'Enter') {
                                                     event.preventDefault()
+
                                                     addTag(
                                                         field.value,
                                                         field.onChange,
@@ -365,6 +327,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                                                     field.value,
                                                     field.onChange,
                                                 )
+
                                                 field.onBlur()
                                             }}
                                             placeholder="+ adicionar"
@@ -379,6 +342,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                                     </div>
                                 )}
                             />
+
                             {errors.tags && (
                                 <span
                                     id="tags-error"
@@ -398,9 +362,11 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                                     type="url"
                                     mono
                                     placeholder="https://github.com/..."
+                                    aria-invalid={Boolean(errors.repositoryUrl)}
                                     {...register('repositoryUrl')}
                                 />
                             </Field>
+
                             <Field
                                 label="Projeto"
                                 error={errors.liveUrl?.message}
@@ -409,6 +375,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                                     type="url"
                                     mono
                                     placeholder="https://..."
+                                    aria-invalid={Boolean(errors.liveUrl)}
                                     {...register('liveUrl')}
                                 />
                             </Field>
@@ -430,6 +397,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                         />
                         O que aprendemos
                     </h2>
+
                     <div className="mt-space-4 flex flex-col gap-space-3">
                         <Field
                             label="Título"
@@ -437,9 +405,11 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                         >
                             <Input
                                 placeholder="A ideia principal, numa frase."
+                                aria-invalid={Boolean(errors.learnedTitle)}
                                 {...register('learnedTitle')}
                             />
                         </Field>
+
                         <Field
                             label="Conteúdo"
                             error={errors.learnedContent?.message}
@@ -447,6 +417,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                             <Textarea
                                 className="min-h-[76px]"
                                 placeholder="Por que isso importa, em duas ou três linhas."
+                                aria-invalid={Boolean(errors.learnedContent)}
                                 {...register('learnedContent')}
                             />
                         </Field>
@@ -478,6 +449,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                             </div>
                         )}
                     />
+
                     {errors.content && (
                         <span
                             id="content-error"
@@ -487,6 +459,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                         </span>
                     )}
                 </section>
+
                 <div className="mt-space-6 flex flex-wrap items-center justify-end gap-space-2 border-t border-line pt-space-4">
                     {saveError && (
                         <p
@@ -496,6 +469,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                             {saveError}
                         </p>
                     )}
+
                     <Button
                         type="submit"
                         name="intent"
@@ -505,6 +479,7 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
                     >
                         {isSaving ? 'Salvando...' : 'Salvar rascunho'}
                     </Button>
+
                     <Button
                         type="submit"
                         name="intent"

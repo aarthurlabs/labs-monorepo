@@ -1,0 +1,9 @@
+{
+    "name": "@labs/tsconfig",
+    "version": "1.0.0",
+    "exports": {
+        "./nextjs": "./nextjs.json",
+        "./node": "./node.json",
+        "./react": "./react.json"
+    }
+}

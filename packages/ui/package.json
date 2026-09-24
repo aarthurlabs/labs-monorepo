@@ -1,0 +1,23 @@
+{
+    "name": "@labs/ui",
+    "version": "1.0.0",
+    "exports": {
+        ".": "./src/index.ts",
+        "./components": "./src/components/index.ts",
+        "./components/*": "./src/components/*.tsx",
+        "./brand": "./src/brand/index.ts",
+        "./brand/assets/*": "./src/brand/assets/*",
+        "./styles.css": "./src/styles.css"
+    },
+    "devDependencies": {
+        "@labs/tsconfig": "workspace:*",
+        "@types/react": "^19.3.0",
+        "react": "19.2.8",
+        "react-dom": "19.2.8",
+        "tailwindcss": "^4.3.3"
+    },
+    "peerDependencies": {
+        "react": "19.2.8",
+        "react-dom": "19.2.8"
+    }
+}

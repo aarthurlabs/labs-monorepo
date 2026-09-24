@@ -36,7 +36,7 @@ export function DropdownMenu({
   const menuId = useId();
 
   function focusItem(index: number) {
-    const items = menuRef.current?.querySelectorAll<HTMLButtonElement>(
+    const items = menuRef.current?.querySelectorAll<HTMLElement>(
       '[role="menuitem"]:not(:disabled)',
     );
     items?.[index]?.focus();
@@ -84,11 +84,11 @@ export function DropdownMenu({
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     const items = Array.from(
-      menuRef.current?.querySelectorAll<HTMLButtonElement>(
+      menuRef.current?.querySelectorAll<HTMLElement>(
         '[role="menuitem"]:not(:disabled)',
       ) ?? [],
     );
-    const index = items.indexOf(document.activeElement as HTMLButtonElement);
+    const index = items.indexOf(document.activeElement as HTMLElement);
     if (event.key === "Escape") {
       event.preventDefault();
       close(true);

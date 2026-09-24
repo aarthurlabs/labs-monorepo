@@ -9,10 +9,14 @@
         "lint": "eslint"
     },
     "dependencies": {
+        "@hookform/resolvers": "^5.9.1",
         "@labs/database": "workspace:*",
         "next": "16.3.6",
         "react": "19.2.8",
-        "react-dom": "19.2.8"
+        "react-dom": "19.2.8",
+        "react-hook-form": "^7.88.0",
+        "slugify": "^1.6.9",
+        "zod": "^4.6.5"
     },
     "devDependencies": {
         "@labs/tsconfig": "workspace:*",

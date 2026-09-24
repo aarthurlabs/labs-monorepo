@@ -19,7 +19,7 @@ export function SiteHeader() {
                         decorative
                         className="inline-block h-[20px] w-[18px] shrink-0 sm:h-[24px] sm:w-[22px]"
                     />
-                    <span>arthurlabs</span>
+                    <span>ArthurLabs</span>
                     <LabBadge className="h-[18px] px-space-2 text-[10px] sm:h-[20px] sm:px-[9px] sm:text-[11px]" />
                 </Link>
 

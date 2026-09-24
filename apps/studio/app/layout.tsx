@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { StudioHeader } from "../components/studio-header";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -24,7 +25,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR" className="h-full">
-      <body className="flex min-h-full flex-col bg-bg font-sans text-text antialiased">{children}</body>
+      <body className="flex min-h-full flex-col bg-bg font-sans text-text antialiased">
+        <StudioHeader />
+        {children}
+      </body>
     </html>
   );
 }

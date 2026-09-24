@@ -15,7 +15,6 @@ import { Tag } from '@labs/ui/components/tag'
 import { Textarea } from '@labs/ui/components/textarea'
 import { Controller, useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
-import slugify from 'slugify'
 
 import { postFormSchema, type PostFormValues } from './post-form.schema'
 import { upsertPost } from './upsert-post.action'
@@ -99,20 +98,12 @@ export function PostEditorForm({ post }: PostEditorFormProps) {
         const intent =
             submitter?.getAttribute('value') === 'publish' ? 'publish' : 'draft'
 
-        const slug = slugify(values.title, {
-            lower: true,
-            strict: true,
-            trim: true,
-            locale: 'pt',
-        })
-
         let navigating = false
 
         try {
             const result = await upsertPost({
                 ...values,
                 id: post?.id,
-                slug,
                 intent,
             })
 

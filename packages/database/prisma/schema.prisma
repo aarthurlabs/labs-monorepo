@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PostType {
+  PROJECT
+  NOTE
+  EXPERIMENT
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model Post {
+  id   String @id @default(cuid())
+  slug String @unique
+
+  number Int?
+
+  title       String
+  description String
+
+  type   PostType
+  status PostStatus @default(DRAFT)
+
+  tags String[]
+
+  content String @db.Text
+
+  learnedTitle   String
+  learnedContent String @db.Text
+
+  repositoryUrl String?
+  liveUrl       String?
+
+  featured Boolean @default(false)
+  position Int     @default(0)
+
+  publishedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type, status])
+  @@index([status, position])
+  @@index([status, featured])
+}

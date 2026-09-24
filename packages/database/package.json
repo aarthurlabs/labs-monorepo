@@ -1,0 +1,30 @@
+{
+  "name": "@labs/database",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "format": "prisma format",
+    "validate": "prisma validate",
+    "generate": "prisma generate",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:studio": "prisma studio",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
+    "dotenv": "^18.0.3",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "@labs/tsconfig": "workspace:*",
+    "@types/node": "^20.19.43",
+    "@types/pg": "^8.23.1",
+    "prisma": "7.10.0"
+  }
+}

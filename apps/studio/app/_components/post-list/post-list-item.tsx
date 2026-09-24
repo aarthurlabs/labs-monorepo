@@ -1,16 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { DropdownMenu } from '@labs/ui/components/dropdown-menu'
+import { Button } from '@labs/ui/components/button'
+import { Dialog } from '@labs/ui/components/dialog'
+import {
+    DropdownMenu,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+} from '@labs/ui/components/dropdown-menu'
 import Link from 'next/link'
 import type { ListedPost } from './get-posts'
+import { deletePost } from './delete-post.action'
 import { togglePostFeatured } from './toggle-post-featured.action'
 
 interface PostListItemProps {
     post: ListedPost
     dragDisabled: boolean
+    onDeleted: (id: string) => void
 }
 
 const typeLabels = {
@@ -26,15 +34,24 @@ const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
     timeZone: 'UTC',
 })
 
-export function PostListItem({ post, dragDisabled }: PostListItemProps) {
+export function PostListItem({ post, dragDisabled, onDeleted }: PostListItemProps) {
     const [featured, setFeatured] = useState(post.featured)
     const [lastServerFeatured, setLastServerFeatured] = useState(post.featured)
     const [featuredPending, setFeaturedPending] = useState(false)
     const [featuredError, setFeaturedError] = useState(false)
+    const [copyStatus, setCopyStatus] = useState<'copied' | 'error' | null>(null)
+    const [deleteOpen, setDeleteOpen] = useState(false)
+    const [deletePending, setDeletePending] = useState(false)
+    const [deleteError, setDeleteError] = useState(false)
     if (post.featured !== lastServerFeatured && !featuredPending) {
         setLastServerFeatured(post.featured)
         setFeatured(post.featured)
     }
+    useEffect(() => {
+        if (!copyStatus) return
+        const timeout = window.setTimeout(() => setCopyStatus(null), 2000)
+        return () => window.clearTimeout(timeout)
+    }, [copyStatus])
     const {
         attributes,
         listeners,
@@ -60,6 +77,30 @@ export function PostListItem({ post, dragDisabled }: PostListItemProps) {
             setFeaturedError(true)
         } finally {
             setFeaturedPending(false)
+        }
+    }
+
+    async function handleCopySlug() {
+        try {
+            await navigator.clipboard.writeText(post.slug)
+            setCopyStatus('copied')
+        } catch {
+            setCopyStatus('error')
+        }
+    }
+
+    async function handleDelete() {
+        if (deletePending) return
+        setDeletePending(true)
+        setDeleteError(false)
+        try {
+            await deletePost(post.id)
+            setDeleteOpen(false)
+            onDeleted(post.id)
+        } catch {
+            setDeleteError(true)
+        } finally {
+            setDeletePending(false)
         }
     }
 
@@ -144,12 +185,112 @@ export function PostListItem({ post, dragDisabled }: PostListItemProps) {
                     <Link
                         href={`/upsert/${post.slug}`}
                         role="menuitem"
-                        className="flex h-[30px] items-center rounded-sm px-[10px] text-meta text-text hover:bg-surface-raised focus-visible:bg-surface-raised focus-visible:outline-none"
+                        className="flex h-[30px] items-center gap-space-2 rounded-sm px-[10px] text-meta text-text hover:bg-surface-raised focus-visible:bg-surface-raised focus-visible:outline-none"
                     >
-                        Editar post
+                        <svg
+                            aria-hidden="true"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.4"
+                            className="size-4 shrink-0"
+                        >
+                            <path d="m3 11 8-8 2 2-8 8-3 1 1-3Z" />
+                        </svg>
+                        Editar
                     </Link>
+                    <DropdownMenuItem onClick={handleCopySlug}>
+                        <svg
+                            aria-hidden="true"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.4"
+                            className="size-4 shrink-0"
+                        >
+                            <rect x="5" y="5" width="8" height="8" rx="1" />
+                            <path d="M11 3H4a1 1 0 0 0-1 1v7" />
+                        </svg>
+                        Copiar slug
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                        variant="danger"
+                        onClick={() => {
+                            setDeleteError(false)
+                            setDeleteOpen(true)
+                        }}
+                    >
+                        <svg
+                            aria-hidden="true"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.4"
+                            className="size-4 shrink-0"
+                        >
+                            <path d="M3 4h10M6 4V2.5h4V4M5 6v7h6V6M7 7.5v4M9 7.5v4" />
+                        </svg>
+                        Excluir post
+                    </DropdownMenuItem>
                 </DropdownMenu>
             </div>
+            <Dialog
+                open={deleteOpen}
+                onOpenChange={setDeleteOpen}
+                alert
+                title="Excluir post?"
+                description={
+                    <>
+                        <strong className="font-semibold text-text">
+                            {post.title}
+                        </strong>{' '}
+                        será removido do Studio e deixará de aparecer no Labs.
+                        Essa ação não pode ser desfeita.
+                    </>
+                }
+                footer={
+                    <>
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            autoFocus
+                            disabled={deletePending}
+                            onClick={() => setDeleteOpen(false)}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="danger"
+                            disabled={deletePending}
+                            onClick={handleDelete}
+                        >
+                            {deletePending ? 'Excluindo...' : 'Excluir post'}
+                        </Button>
+                    </>
+                }
+            >
+                {deleteError && (
+                    <p role="alert" className="mt-space-3 text-label text-danger">
+                        Não foi possível excluir o post. Tente novamente.
+                    </p>
+                )}
+            </Dialog>
+            {copyStatus && (
+                <p
+                    role={copyStatus === 'error' ? 'alert' : 'status'}
+                    className={
+                        copyStatus === 'error'
+                            ? 'pb-space-2 pl-space-12 text-label text-danger'
+                            : 'pb-space-2 pl-space-12 text-label text-text-muted'
+                    }
+                >
+                    {copyStatus === 'error'
+                        ? 'Não foi possível copiar o slug.'
+                        : 'Slug copiado.'}
+                </p>
+            )}
             {featuredError && (
                 <p
                     role="alert"

@@ -80,6 +80,11 @@ export function SortablePostList({ posts }: SortablePostListProps) {
                 key={post.id}
                 post={post}
                 dragDisabled={reordering}
+                onDeleted={(id) => {
+                  setItems((current) =>
+                    current.filter((item) => item.id !== id),
+                  );
+                }}
               />
             ))}
           </ul>

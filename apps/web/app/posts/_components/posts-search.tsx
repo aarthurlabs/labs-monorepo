@@ -93,7 +93,7 @@ export function PostsSearch() {
             <Input
                 type="search"
                 aria-label="Buscar posts"
-                placeholder="Buscar por título, tema ou stack"
+                placeholder="Buscar por título"
                 value={value}
                 onChange={(event) => {
                     const nextValue = event.target.value

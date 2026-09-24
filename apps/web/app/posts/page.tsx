@@ -1,8 +1,16 @@
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { PostsSearch } from './_components/posts-search'
+import { PostsList } from './_components/posts-list'
 
-export default function PostsPage() {
+export default async function PostsPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ q?: string | string[] }>
+}) {
+    const rawQuery = (await searchParams).q
+    const query = (Array.isArray(rawQuery) ? rawQuery[0] : rawQuery)?.trim() ?? ''
+
     return (
         <main className="mx-auto w-full max-w-[var(--content-width)] px-space-6 pt-space-12 pb-space-24">
             <Link
@@ -29,6 +37,24 @@ export default function PostsPage() {
                 }
             >
                 <PostsSearch />
+            </Suspense>
+
+            <Suspense
+                key={query}
+                fallback={
+                    <div role="status" aria-label="Carregando posts" className="mt-space-12">
+                        <div aria-hidden="true" className="mb-space-3 h-8 w-full animate-pulse rounded-sm bg-surface-raised" />
+                        {Array.from({ length: 3 }, (_, index) => (
+                            <div key={index} aria-hidden="true" className="space-y-space-2 border-t border-line py-space-4">
+                                <div className="h-5 w-2/3 animate-pulse rounded-sm bg-surface-raised" />
+                                <div className="h-4 w-full animate-pulse rounded-sm bg-surface-raised" />
+                            </div>
+                        ))}
+                        <span className="sr-only">Carregando posts...</span>
+                    </div>
+                }
+            >
+                <PostsList query={query} />
             </Suspense>
         </main>
     )

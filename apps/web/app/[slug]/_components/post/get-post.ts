@@ -2,7 +2,7 @@ import 'server-only'
 import { db } from '@labs/database'
 
 export async function getPost(slug: string) {
-    return db.post.findFirst({
+    return db.post.findUnique({
         where: { slug, status: 'PUBLISHED' },
         select: {
             id: true,

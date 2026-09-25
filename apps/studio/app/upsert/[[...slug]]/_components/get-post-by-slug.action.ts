@@ -1,9 +1,9 @@
-"use server";
+'use server'
 
-import { db } from "@labs/database";
+import { db } from '@labs/database'
 
 export async function getPostBySlug(slug: string) {
-  return db.post.findUnique({
-    where: { slug },
-  });
+    return db.post.findUnique({
+        where: { slug },
+    })
 }

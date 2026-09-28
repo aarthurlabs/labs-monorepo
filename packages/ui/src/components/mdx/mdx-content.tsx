@@ -75,7 +75,7 @@ export async function MdxContent({ content, className }: MdxContentProps) {
     })
 
     return (
-        <div className={cn('min-w-0 text-text', className)}>
+        <div className={cn('mdx-content min-w-0 text-text', className)}>
             <Content components={mdxComponents} />
         </div>
     )

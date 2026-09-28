@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { PostType } from '@labs/database'
+import { Button } from '@labs/ui/components/button'
 import { Tag } from '@labs/ui/components/tag'
 
 interface PostHeaderProps {
@@ -9,6 +10,8 @@ interface PostHeaderProps {
     number: number | null
     tags: string[]
     publishedAt: Date | null
+    repositoryUrl: string | null
+    liveUrl: string | null
 }
 
 const typeLabels: Record<PostType, string> = {
@@ -41,6 +44,8 @@ export function PostHeader({
     number,
     tags,
     publishedAt,
+    repositoryUrl,
+    liveUrl,
 }: PostHeaderProps) {
     return (
         <header className="relative isolate overflow-hidden pt-space-8">
@@ -81,6 +86,34 @@ export function PostHeader({
                         <Tag key={`${tag}-${index}`}>{tag}</Tag>
                     ))}
                 </div>
+            )}
+            {(repositoryUrl || liveUrl) && (
+                <nav
+                    aria-label="Links do post"
+                    className="mt-space-6 flex flex-wrap gap-space-3"
+                >
+                    {liveUrl && (
+                        <Button
+                            href={liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            variant="primary"
+                        >
+                            Ver projeto <span aria-hidden="true">↗</span>
+                        </Button>
+                    )}
+                    {repositoryUrl && (
+                        <Button
+                            href={repositoryUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            variant="secondary"
+                        >
+                            Ver repositório{' '}
+                            <span aria-hidden="true">↗</span>
+                        </Button>
+                    )}
+                </nav>
             )}
         </header>
     )

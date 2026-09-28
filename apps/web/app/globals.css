@@ -1,2 +1,78 @@
 @import '@labs/ui/styles.css';
 @source '../../../packages/ui/src';
+
+.mdx-content {
+    font-size: 16px;
+    line-height: 27px;
+}
+
+.mdx-content p,
+.mdx-content li,
+.mdx-content ul,
+.mdx-content ol,
+.mdx-content blockquote {
+    line-height: 27px;
+}
+
+.mdx-content p {
+    font-size: 14px;
+    line-height: 24px;
+    margin-block: 16px;
+}
+
+@media (min-width: 640px) {
+    .mdx-content p {
+        font-size: 16px;
+        line-height: 27px;
+    }
+}
+
+.mdx-content ul,
+.mdx-content ol {
+    margin-block: 16px;
+}
+
+.mdx-content li {
+    margin-block: 4px;
+}
+
+.mdx-content h1,
+.mdx-content h2,
+.mdx-content h3,
+.mdx-content h4,
+.mdx-content h5,
+.mdx-content h6 {
+    line-height: 1.35;
+}
+
+.mdx-content h1 {
+    font-size: 28px;
+}
+
+.mdx-content h2 {
+    font-size: 22px;
+}
+
+.mdx-content h3 {
+    font-size: 18px;
+}
+
+.mdx-content h4,
+.mdx-content h5,
+.mdx-content h6 {
+    font-size: 16px;
+}
+
+.mdx-content blockquote {
+    margin-block: 24px;
+}
+
+.mdx-content :not(pre) > code {
+    font-size: 13px;
+    line-height: 20px;
+}
+
+.mdx-content table {
+    font-size: 15px;
+    line-height: 24px;
+}
